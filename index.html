@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VigilantNG</title>
+    <style>
+        .report-card img { display: none !important; }
+        :root { --brand: #00ff00; } /* Default Jungle Green */
+        body { background: #000; color: #fff; font-family: monospace; margin: 0; padding: 0; }
+        .container { 
+        border: 1px solid var(--brand);
+        box-shadow: 0 0 15px rgba(var(--brand-rgb), 0.2);
+        transition: all 0.5s ease; /* Makes the color swap smooth */
+        }
+        .container, #operative-tab, #admin-portal {
+        border-color: var(--brand) !important;
+        }
+        .classification-banner { background: #ff0000; color: #000; text-align: center; font-weight: bold; padding: 5px; font-size: 12px; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .tab-btn { background: #222; color: #555; border: 1px solid #333; padding: 10px; cursor: pointer; }
+        .tab-btn.active { color: var(--brand); border-bottom: 2px solid var(--brand); }
+        .tab-content { display: none; margin-top: 20px; }
+        .tab-content.active { display: block; }
+        input, textarea, button { width: 100%; padding: 10px; margin-top: 10px; background: #111; color: #fff; border: 1px solid #444; box-sizing: border-box; }
+        button {
+        background: var(--brand);
+        color: #000;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: background 0.4s ease, box-shadow 0.4s ease;
+        }
+        button:hover {
+        box-shadow: 0 0 10px var(--brand);
+        opacity: 0.9;
+        }
+        @media print {
+        .tabs, .tab-btn, button, input, textarea { display: none !important; }
+         #admin-portal { display: block !important; }
+        }
+    </style>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+</head>
+<body>
+
+    <div class="classification-banner">// TOP SECRET // OPS ACCESS ONLY //</div>
+
+    <div id="login-screen" style="text-align:center; padding: 50px;">
+    <h2>SYSTEM ACCESS TERMINAL</h2>
+    
+    <div id="login-box">
+        <input type="password" id="sdo-key-input" placeholder="ENTER ACCESS KEY">
+        <button onclick="attemptLogin()">AUTHENTICATE</button>
+        <p><a href="#" onclick="toggleSignup(true)" style="color:gray; font-size:10px;">Request Access?</a></p>
+    </div>
+
+    <div id="signup-form" style="display:none; max-width: 300px; margin: 20px auto; border: 1px solid #333; padding: 20px;">
+        <input type="text" id="new-username" placeholder="FULL NAME / CALLSIGN" style="width:100%; margin-bottom:10px;">
+       <button onclick="startRegistry()" style="width:100%; color:cyan; border:1px solid cyan; background:transparent;">GENERATE MISSION KEY</button>
+        <p><a href="#" onclick="toggleSignup(false)" style="color:red; font-size:10px; text-decoration:none;">RETURN TO LOGIN</a></p>
+    </div>
+</div>
+
+    <div id="app-interface" style="display:none;">
+        <div class="container">
+            <div style="text-align: center; border-bottom: 2px solid var(--brand); padding-bottom: 10px; margin-bottom: 20px;">
+                <div style="font-size: 24px; font-weight: bold;">VigilantNG<span style="color:white;">LAB</span></div>
+                <div id="user-badge" style="font-size: 12px;">OPERATIVE: <span id="display-name" style="color:var(--brand);">---</span></div>
+            </div>
+
+            <div class="tabs" style="display: flex; gap: 5px;">
+                <button class="tab-btn active" onclick="switchTab('operative-tab', this)" style="flex:1;">FIELD OPS</button>
+                <button class="tab-btn" onclick="switchTab('admin-portal', this)" style="flex:1;">S/CORD PORTAL</button>
+            </div>
+
+            <div id="operative-tab" class="tab-content active">
+                <div style="border: 1px dashed yellow; padding: 10px; margin-bottom: 15px; background: rgba(255,255,0,0.05);">
+                    <div style="font-size: 10px; color: yellow;">[ COMMAND DIRECTIVES ]</div>
+                    <div id="live-unit-feedback" style="color: #0f0; margin-top: 5px;">Awaiting Intel...</div>
+                </div>
+            <div style="margin-bottom: 15px; text-align: left;">
+                <label style="font-size: 10px; color: #555; display: block; margin-bottom: 5px;">[ ASSIGNED OPERATION ]</label>
+                <select id="mission-code" onchange="updateMissionTheme()" 
+                 style="width: 100%; background: #000; color: var(--brand); border: 1px solid var(--brand); padding: 10px; font-family: monospace; font-size: 12px; outline: none; cursor: pointer;">
+                <option value="GENERAL" style="background: #000;">OP: UNASSIGNED </option>
+                <option value="ALPHA-9" style="background: #000;">OP: SECTOR ALPHA </option>
+                <option value="GHOST-RIFT" style="background: #000;">OP: SECTOR BRAVO</option>
+                <option value="COBALT-SKY" style="background: #000;">OP: SECTOR CHARLIES</option>
+                <option value="COBALT-SKY" style="background: #000;">OP: SECTOR DELTA</option>
+                <option value="COBALT-SKY" style="background: #000;">OP: SECTOR ECHO</option>
+                </select>
+            </div>
+                <textarea id="analyst-input" rows="5" placeholder="Enter intelligence briefing..."></textarea>
+                <input style="display:none;" type="file" id="file-input" accept="image/*">
+                <button onclick="submitToCloud()">UPLOAD TO COMMAND</button>
+            </div>
+                <div id="mission-log" style="margin-top: 25px; border-top: 1px solid #222; padding-top: 10px;">
+                    <div style="font-size: 10px; color: #444; letter-spacing: 2px; margin-bottom: 10px;">ACTIVITY LOG</div>
+                    <div id="log-entries" style="font-family: monospace; font-size: 11px; color: #00ff00; opacity: 0.7;">
+                         <div style="color: #444;">[SYSTEM READY: Awaiting Input]</div>
+                </div>
+            </div>
+            <div id="submission-log" style="margin-top: 20px; border-top: 1px solid #333; padding-top: 10px;">
+                <div style="font-size: 10px; color: #555; letter-spacing: 1px;">MISSION LOG (LAST 5 DISPATCHES)</div>
+                <div id="log-entries" style="font-size: 11px; color: #888; font-family: monospace; line-height: 1.6;">
+                     </div>
+            
+            </div>
+
+            <div id="admin-portal" class="tab-content">
+                <div style="border: 2px solid red; padding: 15px;">
+                    <strong style="color: red;">[!] HOD OVERRIDE CONSOLE</strong>
+                    <button onclick="loadReviewQueue()" style="margin-top:10px; background: #300; color: white; border-color: red;">REFRESH QUEUE</button>
+                    <div id="review-queue" style="margin-top: 20px;"></div>
+                </div>
+                <button onclick="window.print()" style="background:#444; color:white; margin-top:10px;">
+                    🖨️ PRINT MISSION SUMMARY
+                </button>
+                <div style="margin-bottom: 15px;">
+                     <input type="text" id="admin-search" onkeyup="filterReports()" 
+                            placeholder="🔎 Search by ID or Analyst Name..." 
+                            style="background: #222; border: 1px solid #444; padding: 8px; color: #0f0; font-size: 12px;">
+                </div>
+            </div>
+            
+            <button onclick="location.reload()" style="background:none; border:none; color:#333; font-size:10px; margin-top:50px;">LOGOUT SYSTEM</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+        const supabaseUrl = 'https://asvwvojjrfhvhybmhnke.supabase.co';
+        const supabaseKey = 'sb_publishable_g4DQwFHcmKRqTeWRqa9SdQ_uJ2HQomw';
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        window.currentAnalyst = "";
+        window.currentRole = "";
+
+        // --- AUTHENTICATION ---
+        window.attemptLogin = async function() {
+            const key = document.getElementById('sdo-key-input').value;
+            
+            if (key === "2009") {
+                window.currentRole = 'admin';
+                window.currentAnalyst = 'COMMANDER';
+            } else {
+                const { data, error } = await supabase
+                    .from('access_registry')
+                    .select('*')
+                    .eq('access_key', key)
+                    .single();
+
+                if (error || !data) {
+                    alert("ACCESS DENIED: Invalid Key.");
+                    return;
+                }
+                window.currentRole = data.role || 'operative';
+                window.currentAnalyst = data.full_name || data.name || 'ANALYST';
+            }
+
+            // Update UI
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-interface').style.display = 'block';
+            document.getElementById('display-name').innerText = window.currentAnalyst;
+
+            window.refreshData();
+            if (window.currentRole === 'admin') window.loadReviewQueue();
+        };
+
+        // --- OPERATIVE ACTIONS ---
+    window.submitToCloud = async function() {
+    const content = document.getElementById('analyst-input').value;
+    const mission = document.getElementById('mission-code').value; // Get selected mission
+    if (!content) return alert("EMPTY INTEL BRIEFING");
+
+    const { error } = await supabase.from('submissions').insert([{ 
+        analyst_name: window.currentAnalyst, 
+        content: content 
+    }]);
+
+    if (error) {
+        alert("FAILED: " + error.message);
+    } else {
+        alert("INTEL DISPATCHED");
+        document.getElementById('analyst-input').value = "";
+        console.log("Mission Tagged:", mission);
+        // Update the Operative's feedback display immediately
+        window.refreshData();
+        
+        // --- SYNCHRONIZED LOG LOGIC ---
+        const logBox = document.getElementById('log-entries');
+        
+        // We check if logBox exists before trying to add to it (Safety First)
+        if (logBox) {
+            const logEntry = document.createElement('div');
+            const time = new Date().toLocaleTimeString([], { hour12: false });
+            const randomId = Math.random().toString(36).substr(2, 5).toUpperCase();
+            
+            logEntry.style.borderBottom = "1px solid #1a1a1a";
+            logEntry.style.padding = "2px 0";
+            logEntry.innerHTML = `<span style="color:#444;">[${time}]</span> DISPATCHED: <span style="color:var(--brand);">ID-${randomId}</span>`;
+            
+            logBox.prepend(logEntry); // Puts the newest log at the top
+            
+            // Keeps the log to a maximum of 5 entries to prevent lag
+            if (logBox.children.length > 5) {
+                logBox.lastChild.remove();
+            }
+        }
+    }
+};
+
+    window.refreshData = async function() {
+            if (!window.currentAnalyst) return;
+            const { data } = await supabase.from('submissions')
+                .select('*')
+                .eq('analyst_name', window.currentAnalyst) 
+                .order('created_at', { ascending: false })
+                .limit(1);
+
+            if (data && data[0]) {
+                const feedbackEl = document.getElementById('live-unit-feedback');
+                feedbackEl.style.color = 'var(--brand)';
+                let hodText = data[0].hod_direction ? `<br><span style="color:red; font-weight:bold;">[HOD]: ${data[0].hod_direction}</span>` : "AWAITING COMMAND EVALUATION...";
+                feedbackEl.innerHTML = `<strong>ID: ${String(data[0].id).substring(0,8)}</strong><br>${hodText}`;
+            }
+        };
+
+        // --- ADMIN ACTIONS ---
+        window.loadReviewQueue = async function() {
+            const container = document.getElementById('review-queue');
+            if (!container) return;
+            container.innerHTML = "📡 Fetching Intelligence...";
+
+            const { data, error } = await supabase
+                .from('submissions')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (error) return container.innerHTML = "Error: " + error.message;
+
+            container.innerHTML = "";
+            data.forEach(report => {
+                const div = document.createElement('div');
+                div.style = "border: 1px solid #444; margin: 10px 0; padding: 15px; background: #111;";
+                const time = new Date(report.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                // This prevents the crash if mission_tag is missing from the DB
+                const mTag = (report && report.mission_tag) ? report.mission_tag : 'GEN';
+                const missionBadge = `<span style="background:var(--brand); color:#000; padding:2px 6px; font-size:10px; font-weight:bold; border-radius:3px; margin-right:10px;">${mTag}</span>`;
+                
+                div.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; font-size:11px; color:#888;">
+                        <span>${missionBadge}ID: ${String(report.id).substring(0,8)}</span>
+                        <span>🕒 ${time}</span>
+                    </div>
+                    <div style="color:var(--brand); margin:5px 0;">Analyst: ${report.analyst_name}</div>
+                    <p>${report.content}</p>
+                    <textarea id="feedback-${report.id}" placeholder="Enter Direction..." style="font-size:12px;">${report.hod_direction || ''}</textarea>
+                    <button onclick="dispatchFeedback(${report.id})" style="background:#400; color:white; font-size:12px;">SEND DIRECTIVE</button>
+                `;
+                container.appendChild(div);
+            });
+        };
+
+        window.dispatchFeedback = async function(reportId) {
+            const feedback = document.getElementById(`feedback-${reportId}`).value;
+            const { error } = await supabase.from('submissions').update({ hod_direction: feedback }).eq('id', reportId);
+            if (error) alert(error.message);
+            else alert("DIRECTIVE SENT");
+        };
+
+        // --- SYSTEM TOOLS ---
+        window.switchTab = function(tabId, btn) {
+            if (tabId === 'admin-portal' && window.currentRole !== 'admin') {
+                alert("ACCESS DENIED");
+                return;
+            }
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
+            btn.classList.add('active');
+            if (tabId === 'admin-portal') window.loadReviewQueue();
+        };
+
+        window.toggleSignup = function(show) {
+            document.getElementById('login-box').style.display = show ? 'none' : 'block';
+            document.getElementById('signup-form').style.display = show ? 'block' : 'none';
+        };
+
+    window.processSignup = async function() {
+    const nameInput = document.getElementById('new-username');
+    if (!nameInput || !nameInput.value) {
+        alert("CALLSIGN REQUIRED");
+        return;
+    }
+
+    // We name it 'finalKey' so it is unique
+    const finalKey = Math.floor(100000 + Math.random() * 900000).toString();
+
+    console.log("Generating key for:", nameInput.value); // Log to console
+
+    const { error } = await supabase
+        .from('access_registry')
+        .insert([{ 
+            full_name: nameInput.value, 
+            access_key: finalKey, 
+            role: 'operative' 
+        }]);
+
+    if (error) {
+        alert("REGISTRY ERROR: " + error.message);
+    } else {
+        window.prompt("ACCESS GRANTED. COPY YOUR KEY:", finalKey);
+        window.toggleSignup(false);
+    }
+};
+        setInterval(window.refreshData, 30000);
+
+        window.filterReports = function() {
+    const searchTerm = document.getElementById('admin-search').value.toLowerCase();
+    const reports = document.querySelectorAll('.report-card'); // Or whatever class your cards use
+
+    reports.forEach(report => {
+        // We look at the text inside the card to see if it matches the search
+        const text = report.innerText.toLowerCase();
+        if (text.includes(searchTerm)) {
+            report.style.display = "block";
+        } else {
+            report.style.display = "none";
+        }
+    });
+};
+
+    window.updateMissionTheme = function() {
+    const mission = document.getElementById('mission-code').value;
+    const root = document.documentElement;
+
+    const themes = {
+        'GENERAL': '#00ff00',   // Jungle Green
+        'ALPHA-9': '#ff3300',   // Strike Red
+        'GHOST-RIFT': '#00d4ff', // Stealth Blue
+        'COBALT-SKY': '#ffbf00'  // Aerial Amber
+    };
+
+    const color = themes[mission] || '#00ff00';
+    root.style.setProperty('--brand', color);
+
+    // Visual feedback in the Mission Log
+    const logBox = document.getElementById('log-entries');
+    if (logBox) {
+        const shiftEntry = document.createElement('div');
+        shiftEntry.style.color = color;
+        shiftEntry.innerHTML = `[SYSTEM] ENVIRONMENT SHIFT: ${mission} ACTIVE`;
+        logBox.prepend(shiftEntry);
+    }
+};
+
+// --- REGISTRY ADD-ON ---
+window.toggleSignup = function(show) {
+    const loginBox = document.getElementById('login-box');
+    const signupForm = document.getElementById('signup-form');
+    if(loginBox && signupForm) {
+        loginBox.style.display = show ? 'none' : 'block';
+        signupForm.style.display = show ? 'block' : 'none';
+    }
+};
+
+window.startRegistry = async function() {
+    console.log("Registry process started...");
+    
+    const nameInput = document.getElementById('new-username');
+    if (!nameInput || !nameInput.value) return alert("CALLSIGN REQUIRED");
+
+    // We use 'generatedKey' to be 100% sure there is no 'key' conflict
+    const generatedKey = Math.floor(100000 + Math.random() * 900000).toString();
+
+    const { error } = await supabase
+        .from('access_registry')
+        .insert([{ 
+            full_name: nameInput.value, 
+            access_key: generatedKey, 
+            role: 'operative' 
+        }]);
+
+    if (error) {
+        alert("REGISTRY ERROR: " + error.message);
+    } else {
+        window.prompt("ACCESS GRANTED. SAVE YOUR KEY:", generatedKey);
+        // Ensure this function name matches your navigation function
+        if (typeof window.toggleSignup === 'function') window.toggleSignup(false);
+    }
+};
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log('Service Worker Registered!'))
+        .catch(err => console.log('Service Worker Failed:', err));
+    });
+  }
+</script>
+</body>
+</html>

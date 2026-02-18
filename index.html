@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a237e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <title>VigilantNG:Estate Security Solutions</title>
     <style>
         .sos-button {
@@ -37,8 +39,16 @@
         }
         
     </style>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="/icon-192.png">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </head>
 <body>
     <header style="text-align: center; padding: 20px;">

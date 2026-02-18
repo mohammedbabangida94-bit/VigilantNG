@@ -1,23 +1,20 @@
 {
+  "name": "VigilantNG Security",
   "short_name": "VigilantNG",
-  "name": "VigilantNG: Estate Security Solutions",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a237e",
   "icons": [
     {
-      "src": "icon-192.png",
-      "type": "image/png",
+      "src": "icon.png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
-  ],
-  "start_url": "/index.html",
-  "background_color": "#1a237e",
-  "display": "standalone",
-  "scope": "/",
-  "theme_color": "#1a237e",
-  "description": "Emergency SOS and Situation Reporting for Nigerian Estates and Security Outfits."
+  ]
 }

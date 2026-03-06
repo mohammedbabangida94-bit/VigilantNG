@@ -5,10 +5,13 @@ let timeLeft = 3;
 
 // 2. HELPER FUNCTIONS
 const smsUrlBuilder = (body) => {
-    const contactNum = "+2348000000000"; // Update to Amanat Emergency Number
+    // Look for the input where the user types the contact number
+    const contactInput = document.getElementById('contact1'); 
+    // If it's empty, use a default emergency number
+    const contactNum = contactInput && contactInput.value ? contactInput.value : "+2348000000000"; 
+    
     return `sms:${contactNum}?body=${encodeURIComponent(body)}`;
-};
-
+    };
 const showSmsButton = (smsUrl) => {
     const statusMsg = document.getElementById('statusMsg');
     statusMsg.innerHTML = `
@@ -119,3 +122,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (stopBtn) stopBtn.addEventListener('click', window.stopAll);
 });
+
+const contactInput = document.getElementById('contact1');
+if(contactInput) {
+    // Load saved number
+    contactInput.value = localStorage.getItem('vgn_contact') || '';
+    // Save number as they type
+    contactInput.addEventListener('input', () => {
+        localStorage.setItem('vgn_contact', contactInput.value);
+    });
+}

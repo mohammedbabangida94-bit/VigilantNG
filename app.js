@@ -8,24 +8,18 @@ const smsUrlBuilder = (body) => {
     const c1 = document.getElementById('contact1')?.value || "";
     const c2 = document.getElementById('contact2')?.value || "";
     
-    // Clean the numbers (remove spaces/dashes)
-    const cleanC1 = c1.replace(/\s+/g, '');
-    const cleanC2 = c2.replace(/\s+/g, '');
-    
-    // Create an array of valid numbers
-    const contacts = [cleanC1, cleanC2].filter(n => n.length > 0);
-    
-    // Determine the separator: 
-    // Android usually prefers a comma (,) 
-    // iOS/Some apps prefer a semicolon (;)
-    // We will use a comma as the primary standard
-    const separator = ","; 
-    const finalRecipients = contacts.join(separator);
-    
-    const defaultNum = "+2348000000000";
-    const target = finalRecipients || defaultNum;
+const cleanC1 = c1.replace(/\s+/g, '');
+const cleanC2 = c2.replace(/\s+/g, '');
+const contacts = [cleanC1, cleanC2].filter(n => n.length > 0);
 
-    return `sms:${target}?body=${encodeURIComponent(body)}`;
+    // TRICK: For multi-contact with a body on Android, 
+    // some apps prefer a semicolon and a different body prefix.
+    const recipients = contacts.join(';'); 
+    
+    // If multiple contacts exist, we use &body instead of ?body for some Android versions
+    const separator = recipients.includes(';') ? '&' : '?';
+    
+    return `sms:${recipients}${separator}body=${encodeURIComponent(body)}`;
 };
 const showSmsButton = (smsUrl) => {
     const statusMsg = document.getElementById('statusMsg');

@@ -146,8 +146,8 @@ if(contact2Input) {
         window.playSiren();
     }, (err) => {
         const smsBody = `VIGN EMERGENCY! (GPS Off)%0A` +
-                        `Blood: ${blood}%0A` +
-                        `Allergies: ${allergies}`;
+                        `Street: ${street}%0A` +
+                        `House Number: ${house}`;
         showSmsButton(smsBody);
         window.playSiren();
     }, { enableHighAccuracy: true });

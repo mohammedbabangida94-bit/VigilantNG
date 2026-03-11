@@ -139,8 +139,8 @@ if(contact2Input) {
 
         const smsBody = `VIGN EMERGENCY ALERT!%0A` +
                         `Location: ${mapUrl}%0A` +
-                        `Blood: ${blood}%0A` +
-                        `Allergies: ${allergies}`;
+                        `Street: ${street}%0A` +
+                        `House: ${house}`;
 
         showSmsButton(smsBody); // Trigger the dual buttons
         window.playSiren();

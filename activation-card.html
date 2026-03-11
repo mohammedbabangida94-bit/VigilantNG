@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Activation Card</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f0f0; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        
+        /* THE CARD CONTAINER */
+        .card {
+            width: 400px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+            border: 1px solid #ddd;
+            margin-bottom: 40px;
+        }
+
+        /* THE HOTEL STYLE (GOLD) */
+        .hotel-theme { border-top: 10px solid #C5A021; }
+        .hotel-accent { color: #C5A021; }
+        .hotel-btn { background: #C5A021; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 10px;}
+
+        /* THE CAMPUS STYLE (NAVY) */
+        .campus-theme { border-top: 10px solid #1565C0; }
+        .campus-accent { color: #1565C0; }
+        .campus-btn { background: #1565C0; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: inline-block; margin-top: 10px;}
+
+        .qr-placeholder {
+            width: 150px;
+            height: 150px;
+            background: #eee;
+            margin: 20px auto;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .instructions { text-align: left; margin: 20px 0; font-size: 14px; color: #444; line-height: 1.6; }
+        .footer { font-size: 10px; color: #888; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+    </style>
+</head>
+<body>
+        
+    <div class="card hotel-theme">
+        <img src="icon.png" style="width:260px; height:120px; margin:20px auto; display:block;"> 
+        <h2 class="hotel-accent">Vigilant-Stay</h2>
+        <p><strong>Activate Your Digital Guest Guardian</strong></p>
+        
+        <div class="qr-placeholder">
+           <img src="qr code.jpg" style="width:150px; height:150px; margin:20px auto; display:block;">
+        </div>
+
+        <div class="instructions">
+            <strong>1.</strong> Scan the QR code above.<br>
+            <strong>2.</strong> Enter your <strong>Street</strong> and <strong>House Number</strong>.<br>
+            <strong>3.</strong> Press <strong>ACTIVATE</strong> to connect to Security.
+        </div>
+
+        <div class="hotel-btn">Estate Security Solution</div>
+        
+        <div class="footer">
+            🔒 Privacy Guaranteed. Location shared only during SOS activation. <br>
+            <em>Powered by Vigilant Global Network</em>
+        </div>
+    </div>
+</body>
+</html>
